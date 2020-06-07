@@ -1,6 +1,15 @@
 import 'package:flutter/material.dart';
 
+final List<String> students = <String>[];
+
 void main() {
+  int j = 0;
+  for (var i = 0; i < 100; i++) {
+    String student = "Student" + j.toString();
+
+    students.add(student);
+    j++;
+  }
   runApp(MyApp());
 }
 
@@ -9,31 +18,25 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          title: Text('My app'),
-        ),
-        body: Column(
-          children: <Widget>[
-            Center(
-              child: Text(
-                "Welcome",
-                style: TextStyle(fontSize: 20.0),
-              ),
-              heightFactor: 35.0,
-            ),
-            Row(
-              children: <Widget>[
-                RaisedButton(
-                  onPressed: () {},
-                  child: Text("Continue"),
-                ),
-                SizedBox(width: 20.0,)
-              ],
-              mainAxisAlignment: MainAxisAlignment.end,
-            )
-          ],
-        ),
-      ),
+          appBar: AppBar(
+            title: Text('Students'),
+          ),
+          body: ListOfStudent()),
     );
+  }
+}
+
+final list = ListView.builder(itemBuilder: (BuildContext context, int index) {
+  return Container(
+    child: Center(
+      child: Text('${students[index]}'),
+    ),
+  );
+});
+
+class ListOfStudent extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return list;
   }
 }
