@@ -3,13 +3,22 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-void main() async {
+void main() {
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  final Future _repo =
-      http.get('https://api.github.com/search/repositories?q=flutter');
+  Future<List<String>> getRepositories() async {
+    final response =
+        await http.get('https://api.github.com/search/repositories?q=flutter');
+
+      final jsonObject = jsonDecode(response.body);
+      final repositories =
+          jsonObject['items'].map((item) => item['owner']['repos_url']).toList();
+
+      return repositories;
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,34 +27,25 @@ class MyApp extends StatelessWidget {
         appBar: AppBar(
           title: Text('Repositories'),
         ),
-        body: FutureBuilder<http.Response>(
-          future: _repo,
+        body: FutureBuilder<List<String>>(
+          future: getRepositories(),
           builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              var list = jsonDecode(snapshot.data.body);
-              list = list['items'];
-              List<String> repoList = [];
+            final repositories = snapshot.data;
 
-              for (var i = 0; i < list.length; i++) {
-                repoList.add(list[i]['owner']['repos_url']);
-              }
-
-              return ListView.builder(
-                itemCount: repoList.length,
-                itemBuilder: (context, index) {
-                  String i = index.toString();
-
-                  return Container(
-                    height: 50,
-                    child: Container(
-                      child: Text('repo $i: ${repoList[index]}'),
-                    ),
-                  );
-                },
-              );
+            if (!snapshot.hasData) {
+              return CircularProgressIndicator();
             }
+            return ListView.builder(
+              itemCount: repositories.length,
+              itemBuilder: (context, index) {
+                String i = index.toString();
 
-            return CircularProgressIndicator();
+                return Container(
+                  padding: EdgeInsets.all(16),
+                  child: Text('repo $i: ${repositories[index]}'),
+                );
+              },
+            );
           },
         ),
       ),
