@@ -12,12 +12,12 @@ class MyApp extends StatelessWidget {
     final response =
         await http.get('https://api.github.com/search/repositories?q=flutter');
 
-      final jsonObject = jsonDecode(response.body);
-      final repositories =
-          jsonObject['items'].map((item) => item['owner']['repos_url']).toList();
-
-      return repositories;
-
+    final jsonObject = jsonDecode(response.body);
+    final repositories = jsonObject['items']
+        .map((item) => item['owner']['repos_url'])
+        .cast<String>()
+        .toList();
+    return repositories;
   }
 
   @override
@@ -32,6 +32,7 @@ class MyApp extends StatelessWidget {
           builder: (context, snapshot) {
             final repositories = snapshot.data;
 
+            print(snapshot.toString());
             if (!snapshot.hasData) {
               return CircularProgressIndicator();
             }
