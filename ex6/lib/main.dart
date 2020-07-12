@@ -8,15 +8,23 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  Future<List<String>> getRepositories() async {
+  final List<RepoInfo> list = new List();
+
+  Future<List<RepoInfo>> getRepositories() async {
     final response =
         await http.get('https://api.github.com/search/repositories?q=flutter');
 
     final jsonObject = jsonDecode(response.body);
+    //jsonObject['items'] is array
+    String x = '';
+    jsonObject['items'].forEach((item) => {
+          x = item['commits_url'].toString().split("{")[0],
+          list.add(new RepoInfo(item['name'], x))
+        });
     final repositories =
         jsonObject['items'].map((item) => item['name']).cast<String>().toList();
 
-    return repositories;
+    return list;
   }
 
   @override
@@ -29,7 +37,7 @@ class MyApp extends StatelessWidget {
         appBar: AppBar(
           title: Text('Repositories'),
         ),
-        body: FutureBuilder<List<String>>(
+        body: FutureBuilder<List<RepoInfo>>(
           future: getRepositories(),
           builder: (context, snapshot) {
             final repositories = snapshot.data;
@@ -43,28 +51,15 @@ class MyApp extends StatelessWidget {
                 return Container(
                   padding: EdgeInsets.all(2),
                   child: ListTile(
-                    title: Text('${repositories[index]}'),
+                    title: Text('${repositories[index].name}'),
                     onTap: () {
                       Navigator.pushNamed(
                         context,
                         SecondRoute.routeName,
-                        arguments: RepoInfo('Commits', index),
+                        arguments: repositories[index],
                       );
                     },
                   ),
-                  // child: RaisedButton(
-                  //   onPressed: () {
-                  //     Navigator.pushNamed(
-                  //       context,
-                  //       SecondRoute.routeName,
-                  //       arguments: RepoInfo(
-                  //         'Commits',
-                  //         index,
-                  //       ),
-                  //     );
-                  //   },
-                  //   child: Text('${repositories[index]}'),
-                  // ),
                 );
               },
             );
@@ -76,48 +71,51 @@ class MyApp extends StatelessWidget {
 }
 
 class SecondRoute extends StatelessWidget {
-  static const routeName = '/extractArguments';
+  static final String routeName = "ha?";
 
-  Future<String> getRepositories(int index) async {
-    final response = await http.get(
-        'https://api.github.com/repos/iampawan/FlutterExampleApps/commits');
-
+  Future<List<String>> getCommits(url) async {
+    final response = await http.get(url);
     final jsonObject = jsonDecode(response.body);
-    final repositories = jsonObject[index]['commit']['message'];
+    final List<String> list = new List();
 
-    return repositories;
+    jsonObject.forEach((item) => list.add(item['commit']['message']));
+
+    return list;
   }
 
   @override
   Widget build(BuildContext context) {
     final RepoInfo repoInfo = ModalRoute.of(context).settings.arguments;
-
+    print(repoInfo.url);
     return Scaffold(
       appBar: AppBar(
         title: Text("Commits"),
       ),
       body: FutureBuilder(
-        future: getRepositories(repoInfo.number),
+        future: getCommits(repoInfo.url),
         builder: (context, snapshot) {
+          final repositories = snapshot.data;
+
           if (!snapshot.hasData) {
             return CircularProgressIndicator();
           }
-
-          return Center(
-            child: Text(snapshot.data),
+          return ListView.builder(
+            itemCount: repositories.length,
+            itemBuilder: (context, index) {
+              return ListTile(
+                title: Text('commit $index : ${repositories[index]}'),
+              );
+            },
           );
         },
       ),
-      // body: Center(
-      //   child: Text(repoInfo.name),
-      // ),
     );
   }
 }
 
 class RepoInfo {
   final String name;
-  final int number;
+  final String url;
 
-  RepoInfo(this.name, this.number);
+  RepoInfo(this.name, this.url);
 }
