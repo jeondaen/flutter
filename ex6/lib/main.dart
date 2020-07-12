@@ -41,20 +41,30 @@ class MyApp extends StatelessWidget {
               itemCount: repositories.length,
               itemBuilder: (context, index) {
                 return Container(
-                  padding: EdgeInsets.all(16),
-                  child: RaisedButton(
-                    onPressed: () {
+                  padding: EdgeInsets.all(2),
+                  child: ListTile(
+                    title: Text('${repositories[index]}'),
+                    onTap: () {
                       Navigator.pushNamed(
                         context,
                         SecondRoute.routeName,
-                        arguments: RepoInfo(
-                          'Commits',
-                          index,
-                        ),
+                        arguments: RepoInfo('Commits', index),
                       );
                     },
-                    child: Text('${repositories[index]}'),
                   ),
+                  // child: RaisedButton(
+                  //   onPressed: () {
+                  //     Navigator.pushNamed(
+                  //       context,
+                  //       SecondRoute.routeName,
+                  //       arguments: RepoInfo(
+                  //         'Commits',
+                  //         index,
+                  //       ),
+                  //     );
+                  //   },
+                  //   child: Text('${repositories[index]}'),
+                  // ),
                 );
               },
             );
@@ -73,7 +83,7 @@ class SecondRoute extends StatelessWidget {
         'https://api.github.com/repos/iampawan/FlutterExampleApps/commits');
 
     final jsonObject = jsonDecode(response.body);
-    final repositories = jsonObject[index]['commit']['url'];
+    final repositories = jsonObject[index]['commit']['message'];
 
     return repositories;
   }
