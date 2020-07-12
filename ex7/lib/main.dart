@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 main() {
@@ -10,7 +9,7 @@ class HomeApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: StreamBuilder(
-        stream: getFuture(),
+        stream: getWeather(),
         builder: (context, snapshot) {
           print(snapshot.data);
           if (!snapshot.hasData) {
@@ -24,7 +23,7 @@ class HomeApp extends StatelessWidget {
   }
 }
 
-Stream<String> getFuture() async* {
+Stream<String> getWeather() async* {
   await Future.delayed(Duration(seconds: 1));
   yield "Sunny";
   await Future.delayed(Duration(seconds: 1));
