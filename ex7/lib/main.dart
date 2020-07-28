@@ -4,7 +4,7 @@ main() {
   runApp(MyApp());
 }
 
-class HomeApp extends StatelessWidget {
+class WeatherWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -38,20 +38,20 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: "Ex7",
-      home: MainApp(),
+      home: MainScreen(),
     );
   }
 }
 
 // Main Frame
-class MainApp extends StatelessWidget {
+class MainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("Ex7"),
       ),
-      body: HomeApp(),
+      body: WeatherWidget(),
     );
   }
 }
