@@ -8,9 +8,8 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  final List<RepoInfo> list = new List();
-
   Future<List<RepoInfo>> getRepositories() async {
+    final List<RepoInfo> repositories = new List();
     final response =
         await http.get('https://api.github.com/search/repositories?q=flutter');
 
@@ -18,19 +17,19 @@ class MyApp extends StatelessWidget {
     //jsonObject['items'] is array
     jsonObject['items'].forEach((item) {
       String x = item['commits_url'].toString().split("{")[0];
-      list.add(new RepoInfo(item['name'], x));
+      repositories.add(new RepoInfo(item['name'], x));
     });
     //final repositories =
     //  jsonObject['items'].map((item) => item['name']).cast<String>().toList();
 
-    return list;
+    return repositories;
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       routes: {
-        SecondRoute.routeName: (context) => SecondRoute(),
+        CommitsScreen.routeName: (context) => CommitsScreen(),
       },
       home: Scaffold(
         appBar: AppBar(
@@ -54,7 +53,7 @@ class MyApp extends StatelessWidget {
                     onTap: () {
                       Navigator.pushNamed(
                         context,
-                        SecondRoute.routeName,
+                        CommitsScreen.routeName,
                         arguments: repositories[index],
                       );
                     },
@@ -69,17 +68,17 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class SecondRoute extends StatelessWidget {
-  static final String routeName = "";
+class CommitsScreen extends StatelessWidget {
+  static final String routeName = "commits";
 
   Future<List<String>> getCommits(url) async {
     final response = await http.get(url);
     final jsonObject = jsonDecode(response.body);
-    final List<String> list = new List();
+    final List<String> commitMessages = new List();
 
-    jsonObject.forEach((item) => list.add(item['commit']['message']));
+    jsonObject.forEach((item) => commitMessages.add(item['commit']['message']));
 
-    return list;
+    return commitMessages;
   }
 
   @override
