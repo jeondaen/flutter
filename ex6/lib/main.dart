@@ -16,13 +16,12 @@ class MyApp extends StatelessWidget {
 
     final jsonObject = jsonDecode(response.body);
     //jsonObject['items'] is array
-    String x = '';
-    jsonObject['items'].forEach((item) => {
-          x = item['commits_url'].toString().split("{")[0],
-          list.add(new RepoInfo(item['name'], x))
-        });
-    final repositories =
-        jsonObject['items'].map((item) => item['name']).cast<String>().toList();
+    jsonObject['items'].forEach((item) {
+      String x = item['commits_url'].toString().split("{")[0];
+      list.add(new RepoInfo(item['name'], x));
+    });
+    //final repositories =
+    //  jsonObject['items'].map((item) => item['name']).cast<String>().toList();
 
     return list;
   }
@@ -71,7 +70,7 @@ class MyApp extends StatelessWidget {
 }
 
 class SecondRoute extends StatelessWidget {
-  static final String routeName = "ha?";
+  static final String routeName = "";
 
   Future<List<String>> getCommits(url) async {
     final response = await http.get(url);
@@ -86,24 +85,22 @@ class SecondRoute extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final RepoInfo repoInfo = ModalRoute.of(context).settings.arguments;
-    print(repoInfo.url);
     return Scaffold(
       appBar: AppBar(
         title: Text("Commits"),
       ),
       body: FutureBuilder(
-        future: getCommits(repoInfo.url),
+        future: getCommits(repoInfo.commitsUrl),
         builder: (context, snapshot) {
-          final repositories = snapshot.data;
-
           if (!snapshot.hasData) {
             return CircularProgressIndicator();
           }
+          final commits = snapshot.data;
           return ListView.builder(
-            itemCount: repositories.length,
+            itemCount: commits.length,
             itemBuilder: (context, index) {
               return ListTile(
-                title: Text('commit $index : ${repositories[index]}'),
+                title: Text('commit $index : ${commits[index]}'),
               );
             },
           );
@@ -115,7 +112,7 @@ class SecondRoute extends StatelessWidget {
 
 class RepoInfo {
   final String name;
-  final String url;
+  final String commitsUrl;
 
-  RepoInfo(this.name, this.url);
+  RepoInfo(this.name, this.commitsUrl);
 }
